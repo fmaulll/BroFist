@@ -1,10 +1,21 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import FighterCard from "../../components/FighterCard";
 import "./styles.scss";
+
+type dataResult = {
+  fname: string;
+  lname: string;
+  height: number;
+  weight: number;
+  win: number;
+  username: string;
+};
 
 const PickFight = () => {
   const token = sessionStorage.getItem("token");
-  const [data, setData] = useState();
+  const [data, setData] = useState<dataResult[] | null>(null);
+  const [increment, setIncrement] = useState<number>(0);
 
   const getFighters = async () => {
     const headerSettings = {
@@ -18,7 +29,7 @@ const PickFight = () => {
         method: "GET",
         headers: headerSettings,
       });
-      console.log(result.data.data);
+      setData(result.data.data);
     } catch (error) {
       alert(error);
     }
@@ -27,8 +38,12 @@ const PickFight = () => {
   useEffect(() => {
     getFighters();
   }, []);
-  
-  return <div className="container">awodkaodkasodkawodkoadni</div>;
+
+  return (
+    <div className="container">
+      {data ? <FighterCard data={data[0]} /> : null}
+    </div>
+  );
 };
 
 export default PickFight;
