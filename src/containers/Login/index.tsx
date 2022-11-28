@@ -1,7 +1,10 @@
 import React, { useState, useEffect, FC } from "react";
 import "./styles.scss";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Axios from "axios";
+import { useAppDispatch } from "../../hooks";
+import { userActions } from "../../store/slice/userSlice";
+import InputText from "../../components/InputText";
 
 type LoginObj = {
   username: string;
@@ -9,6 +12,8 @@ type LoginObj = {
 };
 
 const Login: FC = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const [disabled, setDisabled] = useState<boolean>(true);
   const [dataRequest, setDataRequest] = useState<LoginObj>({
     username: "",
@@ -42,16 +47,14 @@ const Login: FC = () => {
       });
       if (result.status === 200) {
         alert("Logged in!");
-        console.log(result.data.token);
+        sessionStorage.setItem("token", result.data.token);
+        sessionStorage.setItem("id", result.data.id);
+        sessionStorage.setItem("username", result.data.username);
+        dispatch(userActions.login());
+        navigate("/fight");
       }
     } catch (err) {
       alert(err);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      console.log("Enter");
     }
   };
 
@@ -73,18 +76,16 @@ const Login: FC = () => {
           <p>A place where you can beat the sh*t out of anyone</p>
         </div>
         <form onSubmit={handleSubmit}>
-          <label htmlFor="username">User Name</label>
-          <input
-            id="username"
-            type="text"
+          <InputText
+            label="Username"
             placeholder="Username"
+            type="text"
             onChange={handleUsername}
           />
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
+          <InputText
+            label="Password"
             placeholder="Password"
+            type="password"
             onChange={handlePassword}
           />
           <button disabled={disabled} type="submit">
