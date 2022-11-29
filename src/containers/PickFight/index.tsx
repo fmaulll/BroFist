@@ -2,13 +2,14 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import FighterCard from "../../components/FighterCard";
 import "./styles.scss";
+import CrossIcon from "../../assets/icons/Cross.svg"
 
 type dataResult = {
   fname: string;
   lname: string;
   height: number;
   weight: number;
-  win: number;
+  wins: number;
   username: string;
 };
 
@@ -42,6 +43,11 @@ const PickFight = () => {
   return (
     <div className="container">
       {data ? <FighterCard data={data[0]} /> : null}
+      <div className="buttons">
+        {/* <button> */}
+          <img src={CrossIcon} />
+        {/* </button> */}
+      </div>
     </div>
   );
 };

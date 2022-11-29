@@ -1,5 +1,6 @@
 import React, { FC } from "react";
-import "./styles.scss"
+import "./styles.scss";
+import Peter from "../../assets/maxresdefault.jpeg";
 
 interface Props {
   data: {
@@ -7,20 +8,33 @@ interface Props {
     lname: string;
     height: number;
     weight: number;
-    win: number;
+    wins: number;
     username: string;
-  }
+  };
 }
 
-const FighterCard: FC<Props> = ({data}) => {
+const FighterCard: FC<Props> = ({ data }) => {
   return (
     <div className="card">
-      <h2>
-        {data.fname} {data.lname}
-      </h2>
-      <h2>
-        {data.username} {data.height}
-      </h2>
+      <div className="image">
+        <img src={Peter} />
+      </div>
+      <div className="content">
+        <h2>
+          {data.fname} {data.lname}
+        </h2>
+        <div className="summary">
+          <div className="summary-info wins">
+          {data.wins} Wins
+          </div>
+          <div className="summary-info height">
+          {data.height} Cm
+          </div>
+          <div className="summary-info weight">
+          {data.weight} Kg
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
