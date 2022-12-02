@@ -15,3 +15,22 @@
   }
 }
 
+.wrapper {
+  display: flex;
+  height: 100vh;
+
+  .left-grid {
+    background-color: rgb(30, 30, 30);
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .wallpaper {
+    flex: 3;
+    background-image: url("../assets/LoginWallpaper.png");
+    background-size: cover;
+    background-position: center;
+  }
+}

@@ -8,7 +8,7 @@ interface Props {
 }
 
 const Container: FC<Props> = ({ children }) => {
-  const user = sessionStorage.getItem("username")
+  const user = sessionStorage.getItem("username");
   const [loginRegisterPage, setLoginRegisterPage] = useState<boolean>(false);
 
   useEffect(() => {

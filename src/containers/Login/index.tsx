@@ -20,19 +20,11 @@ const Login: FC = () => {
     password: "",
   });
 
-  const handleUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (key: string, value: string) => {
     setDataRequest((prev) => {
       return {
         ...prev,
-        username: e.target.value,
-      };
-    });
-  };
-  const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDataRequest((prev) => {
-      return {
-        ...prev,
-        password: e.target.value,
+        [key]: value,
       };
     });
   };
@@ -77,16 +69,22 @@ const Login: FC = () => {
         </div>
         <form onSubmit={handleSubmit}>
           <InputText
+            value={dataRequest.username}
             label="Username"
             placeholder="Username"
             type="text"
-            onChange={handleUsername}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              handleChange("username", e.target.value)
+            }
           />
           <InputText
+            value={dataRequest.password}
             label="Password"
             placeholder="Password"
             type="password"
-            onChange={handlePassword}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              handleChange("password", e.target.value)
+            }
           />
           <button disabled={disabled} type="submit">
             Login
