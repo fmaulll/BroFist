@@ -21,13 +21,14 @@
 
   .left-grid {
     background-color: rgb(30, 30, 30);
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    flex: 2;
+    // display: flex;
+    // justify-content: center;
+    // align-items: center;
   }
 
-  .wallpaper {
+  .right-grid {
+    position: relative;
     flex: 3;
     background-image: url("../assets/LoginWallpaper.png");
     background-size: cover;

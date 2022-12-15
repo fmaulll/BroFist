@@ -5,6 +5,7 @@ import "./styles.scss";
 import { ReactComponent as RightArrow } from "../../assets/icons/RightArrow.svg";
 import { ReactComponent as LeftArrow } from "../../assets/icons/LeftArrow.svg";
 import axios from "axios";
+import { ReactComponent as ImageIcon } from "../../assets/icons/Image.svg";
 
 type dataRequestValue = {
   username: string;
@@ -14,14 +15,26 @@ type dataRequestValue = {
   lname: string;
   height: number;
   weight: number;
+  image: any;
+  province: string;
+  city: string;
 };
 
 type disabledButton = {
   tabOne: boolean;
   tabTwo: boolean;
   tabThree: boolean;
+  tabFour: boolean;
 };
 
+type dataProvinceValue = {
+  province: string;
+  capitalCity: string;
+};
+
+type dataCityValue = {
+  name: string;
+};
 const Register: FC = () => {
   const navigate = useNavigate();
   const [dataRequest, setDataRequest] = useState<dataRequestValue>({
@@ -32,15 +45,22 @@ const Register: FC = () => {
     lname: "",
     height: 0,
     weight: 0,
+    image: "",
+    province: "",
+    city: "",
   });
   const [disabled, setDisabled] = useState<disabledButton>({
     tabOne: false,
     tabTwo: false,
     tabThree: false,
+    tabFour: false,
   });
+  const [disabledCity, setDisabledCity] = useState<boolean>(true);
   const [valueTab, setValueTab] = useState<number>(0);
+  const [dataProvinces, setDataProvinces] = useState<dataProvinceValue[]>([]);
+  const [dataCity, setDataCity] = useState<dataCityValue[]>([]);
 
-  const handleChange = (key: string, value: string | number) => {
+  const handleChange = (key: string, value: any) => {
     setDataRequest((prev) => {
       return {
         ...prev,
@@ -69,6 +89,9 @@ const Register: FC = () => {
       const result = await axios({
         url: `${import.meta.env.VITE_BROFIST_URL}/auth/register`,
         method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
         data: dataRequest,
       });
       const { data, status } = result;
@@ -81,19 +104,61 @@ const Register: FC = () => {
     }
   };
 
-  useEffect(() => {
-    if (
-      dataRequest.username === "" ||
-      dataRequest.email === "" ||
-      dataRequest.password === ""
-    ) {
-      setDisabled((prev) => {
-        return {
-          ...prev,
-          tabOne: true,
-        };
+  const getProvinces = async () => {
+    try {
+      const result = await axios({
+        url: `${import.meta.env.VITE_BROFIST_URL}/geolocation/province`,
+        method: "GET",
       });
-    } else {
+      if (result.status === 200) {
+        setDataProvinces(result.data.data);
+      }
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  const getCity = async () => {
+    try {
+      const result = await axios({
+        url: `${import.meta.env.VITE_BROFIST_URL}/geolocation/city`,
+        method: "POST",
+        data: { province: dataRequest.province },
+      });
+      if (result.status === 200) {
+        setDataCity(result.data.data);
+      }
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  useEffect(() => {
+    setDisabledCity(true);
+    if (dataRequest.province !== "") {
+      setDisabledCity(false);
+      getCity();
+    }
+  }, [dataRequest.province, dataRequest.city]);
+
+  useEffect(() => {
+    getProvinces();
+  }, []);
+
+  useEffect(() => {
+    setDisabled((prev) => {
+      return {
+        ...prev,
+        tabOne: true,
+        tabTwo: true,
+        tabThree: true,
+      };
+    });
+    if (
+      dataRequest.username !== "" &&
+      dataRequest.email !== "" &&
+      dataRequest.password !== ""
+    ) {
       setDisabled((prev) => {
         return {
           ...prev,
@@ -102,14 +167,7 @@ const Register: FC = () => {
       });
     }
 
-    if (dataRequest.fname === "" || dataRequest.lname === "") {
-      setDisabled((prev) => {
-        return {
-          ...prev,
-          tabTwo: true,
-        };
-      });
-    } else {
+    if (dataRequest.fname !== "" && dataRequest.lname !== "") {
       setDisabled((prev) => {
         return {
           ...prev,
@@ -118,14 +176,7 @@ const Register: FC = () => {
       });
     }
 
-    if (dataRequest.height === 0 || dataRequest.weight === 0) {
-      setDisabled((prev) => {
-        return {
-          ...prev,
-          tabThree: true,
-        };
-      });
-    } else {
+    if (dataRequest.height > 100 && dataRequest.weight > 10) {
       setDisabled((prev) => {
         return {
           ...prev,
@@ -133,9 +184,6 @@ const Register: FC = () => {
         };
       });
     }
-
-    console.log(dataRequest);
-    console.log(disabled);
   }, [dataRequest]);
   return (
     <div className="wrapper">
@@ -197,7 +245,7 @@ const Register: FC = () => {
                 }
               />
             </>
-          ) : (
+          ) : valueTab === 2 ? (
             <>
               <InputText
                 value={dataRequest.height}
@@ -218,8 +266,59 @@ const Register: FC = () => {
                 }
               />
             </>
+          ) : valueTab === 3 ? (
+            <>
+              <label htmlFor="province-select">Province</label>
+              <select
+                id="province-select"
+                value={dataRequest.province}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                  handleChange("province", e.target.value)
+                }
+              >
+                <option value="">Select Province</option>
+                {dataProvinces.map((item) => (
+                  <option value={item.province}>{item.province}</option>
+                ))}
+              </select>
+              <label htmlFor="city-select">City</label>
+              <select
+                disabled={disabledCity}
+                id="city-select"
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                  handleChange("city", e.target.value)
+                }
+              >
+                <option value="">Select Province</option>
+                {dataCity.map((item) => (
+                  <option value={item.name}>{item.name}</option>
+                ))}
+              </select>
+            </>
+          ) : (
+            <>
+              <label htmlFor="input-image" className="input-image-label">
+                <ImageIcon className="image-icon" />
+                {dataRequest.image === "" ? (
+                  <h5>Upload photo</h5>
+                ) : (
+                  <h5>{dataRequest.image.name}</h5>
+                )}
+              </label>
+              <input
+                accept="image/png, image/jpeg"
+                id="input-image"
+                type="file"
+                className="input-image"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const file = e.target.files ? e.target.files[0] : null;
+                  handleChange("image", file);
+                  e.target.value = "";
+                }}
+              />
+            </>
           )}
-          {valueTab === 2 ? (
+          {valueTab === 4 ? (
             <div className="buttons-register">
               <button className="left" onClick={handleClickBack}>
                 <LeftArrow className="register-icon" /> Back
@@ -238,14 +337,14 @@ const Register: FC = () => {
           <button disabled={disabled.tabOne} onClick={handleClickNext}>
             Next <RightArrow className="register-icon" />
           </button>
-        ) : valueTab === 1 ? (
+        ) : valueTab === 1 || valueTab === 2 || valueTab === 3 ? (
           <div className="buttons-register">
             <button className="left" onClick={handleClickBack}>
               <LeftArrow className="register-icon" /> Back
             </button>
             <button
               className="right"
-              disabled={disabled.tabTwo}
+              disabled={valueTab === 1 ? disabled.tabTwo : valueTab === 2 ? disabled.tabThree : disabled.tabFour}
               onClick={handleClickNext}
             >
               Next <RightArrow className="register-icon" />

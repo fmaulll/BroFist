@@ -6,6 +6,7 @@ import { ReactComponent as Cross } from "../../assets/icons/Cross.svg";
 import { ReactComponent as Check } from "../../assets/icons/Check.svg";
 import MatchedModal from "../../components/MatchedModal";
 import NullCard from "../../components/NullCard";
+import { useNavigate } from "react-router-dom";
 
 type dataResult = {
   _id: string;
@@ -15,11 +16,13 @@ type dataResult = {
   weight: number;
   wins: number;
   username: string;
+  imageUrl: string;
 };
 
 const PickFight: FC = () => {
   const token = sessionStorage.getItem("token");
   const userId = sessionStorage.getItem("id");
+  const navigate = useNavigate()
   const [data, setData] = useState<dataResult[] | null>(null);
   const [increment, setIncrement] = useState<number>(0);
   const [success, setSuccess] = useState<boolean>(false);
@@ -75,6 +78,7 @@ const PickFight: FC = () => {
       setData(result.data.data);
     } catch (error) {
       alert(error);
+      navigate("/")
     }
   };
 
